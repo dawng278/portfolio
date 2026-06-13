@@ -1,0 +1,44 @@
+[
+  {
+    "id": "antigravity-extension",
+    "title": "Antigravity Extension",
+    "date": "2026",
+    "outcome": "A browser-extension control layer that keeps OAuth 2.0 token refresh and background jobs isolated from visible UI state.",
+    "focus": [
+      "OAuth 2.0",
+      "Background Workers",
+      "Token Rotation",
+      "Message Bus"
+    ],
+    "githubUrl": "https://github.com/dawng278",
+    "architectureSnippet": "type OAuthSession = {\n  provider: \"google\";\n  accessToken: string;\n  refreshToken: string;\n  expiresAt: number;\n  scopes: readonly [\"profile\", \"email\", \"drive.readonly\"];\n};\n\ntype WorkerCommand =\n  | { type: \"oauth.exchange\"; code: string; verifier: string }\n  | { type: \"oauth.refresh\"; sessionId: string }\n  | { type: \"sync.enqueue\"; resource: \"workspace\" | \"file\"; cursor?: string };\n\nconst extensionRuntime = {\n  ui: \"popup and command palette stay stateless\",\n  background: \"owns PKCE exchange, refresh scheduling, retry backoff\",\n  storage: \"encrypted OAuthSession envelope keyed by provider\",\n  invariant: \"content scripts never receive refresh tokens\"\n} as const;"
+  },
+  {
+    "id": "ai-source-flow-visualizer",
+    "title": "AI-Source Flow Visualizer (ASFV)",
+    "date": "2026",
+    "outcome": "A local-first visualizer that maps source inputs through Ollama-backed AI stages into inspectable data-flow pipelines.",
+    "focus": [
+      "Local Ollama AI",
+      "Data Flow Pipelines",
+      "Trace Replay",
+      "Node Graphs"
+    ],
+    "githubUrl": "https://github.com/dawng278",
+    "architectureSnippet": "type FlowNode = {\n  id: string;\n  kind: \"source\" | \"transform\" | \"ollama\" | \"sink\";\n  inputs: string[];\n  outputs: string[];\n};\n\nconst asfvPipeline = {\n  runtime: \"local-only\",\n  modelEndpoint: \"http://127.0.0.1:11434/api/chat\",\n  stages: [\n    { id: \"source.scan\", kind: \"source\", outputs: [\"documents\"] },\n    { id: \"chunk.semantic\", kind: \"transform\", inputs: [\"documents\"], outputs: [\"chunks\"] },\n    { id: \"ollama.reason\", kind: \"ollama\", inputs: [\"chunks\"], outputs: [\"annotations\"] },\n    { id: \"graph.persist\", kind: \"sink\", inputs: [\"annotations\"], outputs: [\"flowTrace\"] }\n  ] satisfies FlowNode[],\n  invariant: \"prompts and source payloads never leave localhost\"\n} as const;"
+  },
+  {
+    "id": "personal-finance-manager",
+    "title": "Personal Finance Manager",
+    "date": "2025",
+    "outcome": "A C# WinForms finance application with strict N-tier boundaries and rigid SQLite schemas for auditable transaction history.",
+    "focus": [
+      "C# WinForms",
+      "Strict N-tier",
+      "SQLite Schemas",
+      "Repository Layer"
+    ],
+    "githubUrl": "https://github.com/dawng278",
+    "architectureSnippet": "const financeSchema = {\n  presentation: \"WinForms views bind to immutable view models\",\n  application: \"TransactionService validates commands before persistence\",\n  domain: [\"Account\", \"Category\", \"Transaction\", \"Budget\"],\n  infrastructure: {\n    database: \"SQLite\",\n    constraints: [\n      \"FOREIGN KEY(account_id) REFERENCES accounts(id)\",\n      \"CHECK(amount > 0)\",\n      \"UNIQUE(category_type, category_name)\",\n      \"ON DELETE RESTRICT for transaction-owned rows\"\n    ]\n  },\n  invariant: \"UI cannot write directly to SQLite repositories\"\n} as const;"
+  }
+]
